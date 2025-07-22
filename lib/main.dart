@@ -1,121 +1,152 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const TransactionDashboardApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TransactionDashboardApp extends StatelessWidget {
+  const TransactionDashboardApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Elegant Counter',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Roboto',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Elegant Counter App'),
+      title: 'Transaction Dashboard',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const TransactionDashboard(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class TransactionDashboard extends StatelessWidget {
+  const TransactionDashboard({super.key});
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
-  int _counter = 0;
-
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 300),
-  );
-
-  void _incrementCounter() {
-    _controller.forward(from: 0);
-    setState(() {
-      _counter++;
-    });
+  Widget buildStatCard(String label, String value, Color color, IconData icon) {
+    return Expanded(
+      child: Card(
+        elevation: 2,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 16),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(value,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(label, style: const TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  Widget buildAmountRow(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(value,
+            style: TextStyle(
+                color: color, fontWeight: FontWeight.bold, fontSize: 12)),
+        Text(label,
+            style: const TextStyle(fontSize: 12, color: Colors.black54)),
+      ],
+    );
+  }
+
+  Widget buildSection(
+    String title,
+    List<Widget> statCards,
+    List<Widget> bottomStats,
+  ) {
+    return Card(
+      margin: const EdgeInsets.all(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title and Filter Buttons in one row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.bar_chart, color: Colors.black),
+                    const SizedBox(width: 8),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                // Filter buttons aligned to the right
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text("Today", style: TextStyle(fontSize: 12)),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text("Yesterday", style: TextStyle(fontSize: 12)),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text("Last 7 Days", style: TextStyle(fontSize: 12)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(children: statCards),
+            const Divider(),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: bottomStats,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(widget.title,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.indigo, Colors.deepPurple],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        width: double.infinity,
-        height: double.infinity,
-        child: Center(
-          child: Card(
-            elevation: 12,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const Text(
-                    'You have pushed the button this many times:',
-                    style: TextStyle(fontSize: 18),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  ScaleTransition(
-                    scale: Tween<double>(begin: 1.0, end: 1.2)
-                        .animate(CurvedAnimation(
-                      parent: _controller,
-                      curve: Curves.easeOut,
-                    )),
-                    child: Text(
-                      '$_counter',
-                      style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      appBar: AppBar(title: const Text("Transaction Dashboard")),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            buildSection(
+              "All Channels: Transaction Count and Amount Analysis",
+              [
+                buildStatCard("No. of Trn", "4,019", Colors.blue, Icons.list),
+                buildStatCard(
+                    "Successful Trn", "3,920", Colors.green, Icons.check_circle),
+                buildStatCard("Failed Trn", "99", Colors.red, Icons.cancel),
+              ],
+              [
+                buildAmountRow("TOTAL TRN AMOUNT", "58.23 Cr.", Colors.black),
+                buildAmountRow("SUCCESSFUL TRN AMOUNT", "57.93 Cr.", Colors.green),
+                buildAmountRow("FAILED TRN AMOUNT", "29.45 Lakh", Colors.red),
+                buildAmountRow("SUCCESS : FAILED RATIO", "98 : 2", Colors.blueGrey),
+              ],
             ),
-          ),
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _incrementCounter,
-        label: const Text("Add"),
-        icon: const Icon(Icons.add),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
     );
   }
